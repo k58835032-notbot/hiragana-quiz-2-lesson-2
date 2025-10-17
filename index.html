@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hiragana Matching Quiz</title>
+<style>
+  body {
+    font-family: "Segoe UI", sans-serif;
+    background-color: #fff;
+    color: #333;
+    text-align: center;
+    padding: 40px;
+  }
+
+  h1 {
+    color: #a33;
+    margin-bottom: 10px;
+  }
+
+  .quiz-box {
+    display: inline-block;
+    border: 2px solid #f5b5b5;
+    border-radius: 12px;
+    padding: 30px 40px;
+    background-color: #fff7f7;
+  }
+
+  .hiragana {
+    font-size: 64px;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  button {
+    background-color: #f8dcdc;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background 0.2s;
+  }
+
+  button:hover {
+    background-color: #f1a7a7;
+  }
+
+  .result {
+    margin-top: 20px;
+    font-weight: bold;
+    font-size: 20px;
+  }
+
+  .progress {
+    margin-bottom: 15px;
+    font-size: 16px;
+  }
+
+  .restart-btn {
+    margin-top: 25px;
+    background-color: #a33;
+    color: #fff;
+  }
+  .restart-btn:hover {
+    background-color: #c44;
+  }
+</style>
+</head>
+<body>
+
+  <h1>Hiragana Match Quiz</h1>
+  <p>Select the correct romaji for the hiragana shown below.</p>
+
+  <div class="quiz-box">
+    <div class="progress" id="progress"></div>
+    <span class="hiragana" id="hiragana">あ</span>
+    <div class="options" id="options"></div>
+    <div class="result" id="result"></div>
+  </div>
+
+<script>
+const hiraganaPairs = [
+  { char: "あ", romaji: "a" },
+  { char: "い", romaji: "i" },
+  { char: "う", romaji: "u" },
+  { char: "え", romaji: "e" },
+  { char: "お", romaji: "o" },
+  { char: "か", romaji: "ka" },
+  { char: "き", romaji: "ki" },
+  { char: "く", romaji: "ku" },
+  { char: "け", romaji: "ke" },
+  { char: "こ", romaji: "ko" },
+  { char: "が", romaji: "ga" },
+  { char: "ぎ", romaji: "gi" },
+  { char: "ぐ", romaji: "gu" },
+  { char: "げ", romaji: "ge" },
+  { char: "ご", romaji: "go" }
+];
+
+// Create a 30-question list (each character twice)
+let questionPool = [...hiraganaPairs, ...hiraganaPairs];
+let currentIndex = 0;
+let score = 0;
+
+const optionsList = ["a", "i", "u", "e", "o", "ka", "ki", "ku", "ke", "ko", "ga", "gi", "gu", "ge", "go"];
+const hiraganaEl = document.getElementById("hiragana");
+const optionsEl = document.getElementById("options");
+const resultEl = document.getElementById("result");
+const progressEl = document.getElementById("progress");
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function startQuiz() {
+  shuffle(questionPool);
+  currentIndex = 0;
+  score = 0;
+  resultEl.textContent = "";
+  nextQuestion();
+}
+
+function nextQuestion() {
+  if (currentIndex >= questionPool.length) {
+    showFinalResult();
+    return;
+  }
+
+  const currentQ = questionPool[currentIndex];
+  hiraganaEl.textContent = currentQ.char;
+  progressEl.textContent = `Question ${currentIndex + 1} of ${questionPool.length}`;
+  resultEl.textContent = "";
+
+  optionsEl.innerHTML = "";
+  optionsList.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(opt, currentQ.romaji);
+    optionsEl.appendChild(btn);
+  });
+}
+
+function checkAnswer(selected, correct) {
+  if (selected === correct) {
+    resultEl.textContent = "✅ Correct!";
+    resultEl.style.color = "green";
+    score++;
+  } else {
+    resultEl.textContent = `❌ Wrong! Correct: ${correct}`;
+    resultEl.style.color = "red";
+  }
+
+  currentIndex++;
+  setTimeout(nextQuestion, 1200);
+}
+
+function showFinalResult() {
+  hiraganaEl.textContent = "🎉";
+  optionsEl.innerHTML = "";
+  
+  if (score === questionPool.length) {
+    // Special GIF for perfect score
+    const gif = document.createElement("img");
+   gif.src = "https://github.com/k58835032-notbot/hiragana-quiz-2-lesson-2/raw/74ffab4cd30ae2eb2917daa3b9ac960cb18447fa/%E3%81%8B.gif";
+; 
+    gif.alt = "Perfect Score!";
+    gif.style.width = "200px";
+    gif.style.margin = "20px 0";
+    optionsEl.appendChild(gif);
+    
+    resultEl.innerHTML = `Perfect Score! 🎉<br>Your score: <strong>${score}/${questionPool.length}</strong>`;
+  } else {
+    resultEl.innerHTML = `Quiz complete!<br>Your score: <strong>${score}/${questionPool.length}</strong>`;
+  }
+  
+  resultEl.style.color = "#333";
+
+  const restartBtn = document.createElement("button");
+  restartBtn.textContent = "Restart Quiz";
+  restartBtn.classList.add("restart-btn");
+  restartBtn.onclick = startQuiz;
+  optionsEl.appendChild(restartBtn);
+}
+
+startQuiz();
+</script>
+
+</body>
+</html>
